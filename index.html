@@ -27,23 +27,24 @@
                     console.log("plugin telemetry initialized with player ", player)
                 }
 
-                function handleReady(event) {
+                function handleReady() {
                     player.addEventListener(amp.eventName.waiting, handleWaiting);
                     player.addEventListener(amp.eventName.playing, handlePlay);
                     player.addEventListener(amp.eventName.playbackbitratechanged, handlePlaybackBitrateChanged);
                 }
 
-                async function handlePlay(event) {
+                async function handlePlay() {
 
-                    if (buffering.isBuffering && buffering.startBuffering) setNewBufferingEvent()
+                    if (buffering.isBuffering && buffering.startBuffering) {
+                        setNewBufferingEvent()
+                        await sendLog()
+                        buffering.isBuffering = true;
+                        buffering.startBuffering = null;
 
-                    await sendLog()
-
-                    buffering.isBuffering = true;
-                    buffering.startBuffering = null;
+                    }
                 }
 
-                async function handlePlaybackBitrateChanged(event) {
+                async function handlePlaybackBitrateChanged() {
                     bitrateSwitches.push({
                         timestamp: Date.now(),
                         bitrate: player.currentPlaybackBitrate(),
@@ -52,7 +53,7 @@
                     await sendLog()
                 }
 
-                function handleWaiting(event) {
+                function handleWaiting() {
                     buffering.isBuffering = true;
                     buffering.startBuffering = Date.now()
                 }
